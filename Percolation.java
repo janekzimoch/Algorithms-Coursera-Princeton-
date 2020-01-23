@@ -234,6 +234,8 @@ public class Percolation {
         test.open(3, 3);
         test.open(2, 2);
 
+        //
+
         test.draw();
 
         StdOut.println(test.isFull(2, 1));
