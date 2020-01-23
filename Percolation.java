@@ -227,7 +227,7 @@ public class Percolation {
 
     // test client (optional)
     public static void main(String[] args) {
-        Percolation test = new Percolation(3);
+        Percolation test = new Percolation(4);
         test.open(1, 1);
         test.open(2, 1);
         test.open(2, 3);
