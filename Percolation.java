@@ -26,6 +26,9 @@ public class Percolation {
         if (row > grid_size | col > grid_size) throw new IllegalArgumentException();
         if (row < 1 | col < 1) throw new IllegalArgumentException();
 
+        if (isOpen(row, col)) {
+            return;
+        }
 
         // open cell
         grid_open[row - 1][col - 1] = true;

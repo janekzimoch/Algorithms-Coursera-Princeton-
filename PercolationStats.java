@@ -16,14 +16,12 @@ public class PercolationStats {
 
         for (int i = 0; i < trials; i++) {
             Percolation trial = new Percolation(n);
-            int number_of_iterations = 0;
             while (!trial.percolates()) {
                 int row = StdRandom.uniform(1, n + 1);
                 int col = StdRandom.uniform(1, n + 1);
                 trial.open(row, col);
-                number_of_iterations++;
             }
-            iterations[i] = ((double) trial.numberOfOpenSites) / number_of_iterations;
+            iterations[i] = ((double) trial.numberOfOpenSites) / (n * n);
         }
     }
 
@@ -57,6 +55,10 @@ public class PercolationStats {
         StdOut.println(run.stddev());
         StdOut.print("95% confidence interval: ");
         StdOut.println(run.confidenceLo() + ", " + run.confidenceHi());
+//        StdOut.println("-----");
+//        for (double i : run.iterations) {
+//            StdOut.println(i);
+//        }
     }
 
 }
