@@ -4,7 +4,6 @@ import edu.princeton.cs.algs4.StdStats;
 
 public class PercolationStats {
 
-    private double[] iterations;
     private int number_of_trials;
 
     private double mean;
@@ -16,7 +15,7 @@ public class PercolationStats {
         if (n <= 0 | trials <= 0) throw new IllegalArgumentException();
 
         number_of_trials = trials;
-        iterations = new double[trials];
+        double[] iterations = new double[trials];
 
         for (int i = 0; i < trials; i++) {
             Percolation trial = new Percolation(n);
@@ -61,10 +60,6 @@ public class PercolationStats {
         StdOut.println(run.stddev());
         StdOut.print("95% confidence interval: ");
         StdOut.println(run.confidenceLo() + ", " + run.confidenceHi());
-//        StdOut.println("-----");
-//        for (double i : run.iterations) {
-//            StdOut.println(i);
-//        }
     }
 
 }

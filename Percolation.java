@@ -1,15 +1,14 @@
-import edu.princeton.cs.algs4.StdOut;
 import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
     private boolean[][] grid_open;
-    final private WeightedQuickUnionUF quickUnionUF;
     private int numberOfOpenSites;
-    final private int grid_size;
 
-    private int top = 0;
-    private int bottom;
+    final private WeightedQuickUnionUF quickUnionUF;
+    final private int grid_size;
+    final private int top;
+    final private int bottom;
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
@@ -17,7 +16,9 @@ public class Percolation {
 
         grid_size = n;
         grid_open = new boolean[n][n];  // [rows, columns]
-        quickUnionUF = new WeightedQuickUnionUF(n * n);
+        quickUnionUF = new WeightedQuickUnionUF(n * n + 2);
+
+        top = n * n;
         bottom = n * n + 1;
 
         numberOfOpenSites = 0;
@@ -43,138 +44,39 @@ public class Percolation {
 
         // add cell to a group - i.e. modify 'grid_id'
         // Neighbours
-        int n_L = (row - 1) * grid_size + col - 2;
-        int n_R = (row - 1) * grid_size + col;
-        int n_T = (row - 2) * grid_size + col - 1;
-        int n_B = (row) * grid_size + col - 1;
+        int n_L = map2Dto1D(row, col - 1);
+        int n_R = map2Dto1D(row, col + 1);
+        int n_T = map2Dto1D(row - 1, col);
+        int n_B = map2Dto1D(row + 1, col);
 
-        int my_id = (row - 1) * grid_size + col - 1;
+        int my_id = map2Dto1D(row, col);
 
-
-        // corners
-        if (row == 1 & col == 1) {  // TOP-LEFT
-            quickUnionUF.union(n_R, my_id);
-            //RIGHT
-            if (grid_open[row - 1][col]) {
-                quickUnionUF.union(n_R, my_id);
-            }
-            // BOTTOM
-            if (grid_open[row][col - 1]) {
-                quickUnionUF.union(n_B, my_id);
-            }
-
-        } else if (row == grid_size & col == 1) {  // BOTTOM-LEFT
-            // RIGHT
-            if (grid_open[row - 1][col]) {
-                quickUnionUF.union(n_R, my_id);
-            }
-
-            // TOP
-            if (grid_open[row - 2][col - 1]) {
-                quickUnionUF.union(n_T, my_id);
-            }
-
-        } else if (row == 1 & col == grid_size) {  // TOP-RIGHT
-            // LEFT
-            if (grid_open[row - 1][col - 2]) {
-                quickUnionUF.union(n_L, my_id);
-            }
-
-            // BOTTOM
-            if (grid_open[row][col - 1]) {
-                quickUnionUF.union(n_B, my_id);
-            }
-
-        } else if (row == grid_size & col == grid_size) {  // BOTTOM-RIGHT
-            // LEFT
-            if (grid_open[row - 1][col - 2]) {
-                quickUnionUF.union(n_L, my_id);
-            }
-
-            // TOP
-            if (grid_open[row - 2][col - 1]) {
-                quickUnionUF.union(n_T, my_id);
-            }
-
+        if (row == 1) {
+            quickUnionUF.union(my_id, top);
+        }
+        if (row == grid_size) {
+            quickUnionUF.union(my_id, bottom);
         }
 
 
-        // edges
-        else if (col == 1) {  // left edge
-            // RIGHT
-            if (grid_open[row - 1][col]) {
-                quickUnionUF.union(n_R, my_id);
-            }
-            // TOP
-            if (grid_open[row - 2][col - 1]) {
-                quickUnionUF.union(n_T, my_id);
-            }
-            // BOTTOM
-            if (grid_open[row][col - 1]) {
-                quickUnionUF.union(n_B, my_id);
-            }
-
-        } else if (col == grid_size) {  // right edge
-            // LEFT
-            if (grid_open[row - 1][col - 2]) {
-                quickUnionUF.union(n_L, my_id);
-            }
-            // TOP
-            if (grid_open[row - 2][col - 1]) {
-                quickUnionUF.union(n_T, my_id);
-            }
-            // BOTTOM
-            if (grid_open[row][col - 1]) {
-                quickUnionUF.union(n_B, my_id);
-            }
-
-        } else if (row == 1) {  // top edge
-            // LEFT
-            if (grid_open[row - 1][col - 2]) {
-                quickUnionUF.union(n_L, my_id);
-            }
-            // RIGHT
-            if (grid_open[row - 1][col]) {
-                quickUnionUF.union(n_R, my_id);
-            }
-            // BOTTOM
-            if (grid_open[row][col - 1]) {
-                quickUnionUF.union(n_B, my_id);
-            }
-
-        } else if (row == grid_size) {  // bottom edge
-            // LEFT
-            if (grid_open[row - 1][col - 2]) {
-                quickUnionUF.union(n_L, my_id);
-            }
-            // RIGHT
-            if (grid_open[row - 1][col]) {
-                quickUnionUF.union(n_R, my_id);
-            }
-            // TOP
-            if (grid_open[row - 2][col - 1]) {
-                quickUnionUF.union(n_T, my_id);
+        if (n_L != -1) {
+            if (isOpen(row, col - 1)) {
+                quickUnionUF.union(my_id, n_L);
             }
         }
-
-
-        // normal case
-        else {
-            // LEFT
-            if (grid_open[row - 1][col - 2]) {
-                quickUnionUF.union(n_L, my_id);
+        if (n_R != -1) {
+            if (isOpen(row, col + 1)) {
+                quickUnionUF.union(my_id, n_R);
             }
-            // RIGHT
-            if (grid_open[row - 1][col]) {
-                quickUnionUF.union(n_R, my_id);
+        }
+        if (n_T != -1) {
+            if (isOpen(row - 1, col)) {
+                quickUnionUF.union(my_id, n_T);
             }
-            // TOP
-            if (grid_open[row - 2][col - 1]) {
-                quickUnionUF.union(n_T, my_id);
-            }
-            // BOTTOM
-            if (grid_open[row][col - 1]) {
-                quickUnionUF.union(n_B, my_id);
+        }
+        if (n_B != -1) {
+            if (isOpen(row + 1, col)) {
+                quickUnionUF.union(my_id, n_B);
             }
         }
     }
@@ -196,10 +98,8 @@ public class Percolation {
         if (isOpen(row, col)) {
             int my_id = (row - 1) * grid_size + col - 1;
 
-            for (int i = 0; i < grid_size; i++) {
-                if (quickUnionUF.connected(my_id, i)) {
-                    return true;
-                }
+            if (quickUnionUF.connected(my_id, top)) {
+                return true;
             }
         }
         return false;
@@ -212,14 +112,34 @@ public class Percolation {
 
     // does the system percolate?
     public boolean percolates() {
-        for (int col = 1; col < grid_size + 1; col++) {
-            if (isFull(grid_size, col)) {
-                return true;
-            }
-        }
-        return false;
+        return quickUnionUF.connected(bottom, top);
 
     }
+
+
+    private int map2Dto1D(int row, int col) {
+        if (row <= 0 | row > grid_size | col <= 0 | col > grid_size) {
+            return -1;  // invalid grid cell
+        }
+        return (row - 1) * grid_size + col - 1;
+    }
+
+
+    // test client (optional)
+    public static void main(String[] args) {
+//        Percolation test = new Percolation(3);
+//        test.open(1, 1);
+//        test.open(2, 1);
+//        test.open(2, 3);
+//        test.open(3, 3);
+//        test.open(2, 2);
+
+//        test.draw();
+
+//        StdOut.println(test.isFull(2, 1));
+//        StdOut.println(test.percolates());
+    }
+
 
 //    // draws grid representation of:
 //    // 1) open cells
@@ -247,22 +167,4 @@ public class Percolation {
 //        StdOut.println("--------------");
 //
 //    }
-
-
-    // test client (optional)
-    public static void main(String[] args) {
-        Percolation test = new Percolation(3);
-        test.open(1, 1);
-        test.open(2, 1);
-        test.open(2, 3);
-        test.open(3, 3);
-        test.open(2, 2);
-
-//        test.draw();
-
-        StdOut.println(test.isFull(2, 1));
-        StdOut.println(test.percolates());
-
-
-    }
 }
