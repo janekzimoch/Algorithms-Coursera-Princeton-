@@ -3,10 +3,13 @@ import edu.princeton.cs.algs4.WeightedQuickUnionUF;
 
 public class Percolation {
 
-    boolean[][] grid_open;
-    WeightedQuickUnionUF quickUnionUF;
-    int numberOfOpenSites;
-    int grid_size;
+    private boolean[][] grid_open;
+    final private WeightedQuickUnionUF quickUnionUF;
+    private int numberOfOpenSites;
+    final private int grid_size;
+
+    private int top = 0;
+    private int bottom;
 
     // creates n-by-n grid, with all sites initially blocked
     public Percolation(int n) {
@@ -15,6 +18,7 @@ public class Percolation {
         grid_size = n;
         grid_open = new boolean[n][n];  // [rows, columns]
         quickUnionUF = new WeightedQuickUnionUF(n * n);
+        bottom = n * n + 1;
 
         numberOfOpenSites = 0;
 
@@ -33,6 +37,9 @@ public class Percolation {
         // open cell
         grid_open[row - 1][col - 1] = true;
         numberOfOpenSites++;
+        if (grid_size == 1) {
+            return;
+        }
 
         // add cell to a group - i.e. modify 'grid_id'
         // Neighbours
@@ -46,6 +53,7 @@ public class Percolation {
 
         // corners
         if (row == 1 & col == 1) {  // TOP-LEFT
+            quickUnionUF.union(n_R, my_id);
             //RIGHT
             if (grid_open[row - 1][col]) {
                 quickUnionUF.union(n_R, my_id);
@@ -213,32 +221,32 @@ public class Percolation {
 
     }
 
-    // draws grid representation of:
-    // 1) open cells
-    // 2) sets (cells belonging to the same set)
-    public void draw() {
-
-        StdOut.println("--------------");
-
-        // draw open cells
-        for (int row = 1; row < grid_size + 1; row++) {
-            for (int col = 1; col < grid_size + 1; col++) {
-                StdOut.print(isOpen(row, col) ? 1 : 0);
-            }
-            StdOut.println();
-        }
-        StdOut.println("--------------");
-
-        // draw linked sets
-        for (int row = 1; row < grid_size + 1; row++) {
-            for (int col = 1; col < grid_size + 1; col++) {
-                StdOut.print(quickUnionUF.find((row - 1) * grid_size + col - 1));
-            }
-            StdOut.println();
-        }
-        StdOut.println("--------------");
-
-    }
+//    // draws grid representation of:
+//    // 1) open cells
+//    // 2) sets (cells belonging to the same set)
+//    public void draw() {
+//
+//        StdOut.println("--------------");
+//
+//        // draw open cells
+//        for (int row = 1; row < grid_size + 1; row++) {
+//            for (int col = 1; col < grid_size + 1; col++) {
+//                StdOut.print(isOpen(row, col) ? 1 : 0);
+//            }
+//            StdOut.println();
+//        }
+//        StdOut.println("--------------");
+//
+//        // draw linked sets
+//        for (int row = 1; row < grid_size + 1; row++) {
+//            for (int col = 1; col < grid_size + 1; col++) {
+//                StdOut.print(quickUnionUF.find((row - 1) * grid_size + col - 1));
+//            }
+//            StdOut.println();
+//        }
+//        StdOut.println("--------------");
+//
+//    }
 
 
     // test client (optional)
@@ -250,27 +258,11 @@ public class Percolation {
         test.open(3, 3);
         test.open(2, 2);
 
-        test.draw();
+//        test.draw();
 
         StdOut.println(test.isFull(2, 1));
         StdOut.println(test.percolates());
 
-//
-//        test.open(1, 3);
-//        StdOut.println(test.quickUnionUF.find(2));
-
-
-//        test.open(2, 3);
-////        test.open(3, 3);
-//        boolean c = test.isFull(1, 1);
-//        boolean c2 = test.isFull(1, 2);
-//        StdOut.println(c);
-//        StdOut.println(c2);
-//
-//        boolean c = test.isFull(1, 1);
-//        boolean c2 = test.isFull(1, 2);
-//        StdOut.println(c);
-//        StdOut.println(c2);
 
     }
 }
