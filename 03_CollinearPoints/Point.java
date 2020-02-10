@@ -1,0 +1,196 @@
+/******************************************************************************
+ *  Compilation:  javac Point.java
+ *  Execution:    java Point
+ *  Dependencies: none
+ *
+ *  An immutable data type for points in the plane.
+ *  For use on Coursera, Algorithms Part I programming assignment.
+ *
+ ******************************************************************************/
+
+import edu.princeton.cs.algs4.StdDraw;
+import edu.princeton.cs.algs4.StdOut;
+
+import java.util.Comparator;
+
+public class Point implements Comparable<Point> {
+
+    private final int x;     // x-coordinate of this point
+    private final int y;     // y-coordinate of this point
+
+    /**
+     * Initializes a new point.
+     *
+     * @param x the <em>x</em>-coordinate of the point
+     * @param y the <em>y</em>-coordinate of the point
+     */
+    public Point(int x, int y) {
+        /* DO NOT MODIFY */
+        this.x = x;
+        this.y = y;
+    }
+
+    /**
+     * Draws this point to standard draw.
+     */
+    public void draw() {
+        /* DO NOT MODIFY */
+        StdDraw.point(x, y);
+    }
+
+    /**
+     * Draws the line segment between this point and the specified point
+     * to standard draw.
+     *
+     * @param that the other point
+     */
+    public void drawTo(Point that) {
+        /* DO NOT MODIFY */
+        StdDraw.line(this.x, this.y, that.x, that.y);
+    }
+
+    /**
+     * Returns the slope between this point and the specified point.
+     * Formally, if the two points are (x0, y0) and (x1, y1), then the slope
+     * is (y1 - y0) / (x1 - x0). For completeness, the slope is defined to be
+     * +0.0 if the line segment connecting the two points is horizontal;
+     * Double.POSITIVE_INFINITY if the line segment is vertical;
+     * and Double.NEGATIVE_INFINITY if (x0, y0) and (x1, y1) are equal.
+     *
+     * @param that the other point
+     * @return the slope between this point and the specified point
+     */
+    public double slopeTo(Point that) {
+        /* YOUR CODE HERE */
+
+        // vertical slope
+        if (that.x - this.x == 0) {
+            if (that.y - this.y == 0) return Double.NEGATIVE_INFINITY;
+            return Double.POSITIVE_INFINITY;
+        }
+
+        // horizontal slope
+        if (that.y - this.y == 0) return 0.0;
+
+        // normal case
+        return (double) (that.y - this.y) / (double) (that.x - this.x);
+    }
+
+    /**
+     * Compares two points by y-coordinate, breaking ties by x-coordinate.
+     * Formally, the invoking point (x0, y0) is less than the argument point
+     * (x1, y1) if and only if either y0 < y1 or if y0 = y1 and x0 < x1.
+     *
+     * @param that the other point
+     * @return the value <tt>0</tt> if this point is equal to the argument
+     * point (x0 = x1 and y0 = y1);
+     * a negative integer if this point is less than the argument
+     * point; and a positive integer if this point is greater than the
+     * argument point
+     */
+    public int compareTo(Point that) {
+        /* YOUR CODE HERE */
+        if (this.y > that.y) return 1;
+        if (this.y == that.y) {
+            if (this.x > that.x) return 1;
+            if (this.x == that.x) return 0;
+            return -1;
+        }
+        return -1;
+    }
+
+    /**
+     * Compares two points by the slope they make with this point.
+     * The slope is defined as in the slopeTo() method.
+     *
+     * @return the Comparator that defines this ordering on points
+     */
+    public Comparator<Point> slopeOrder() {
+        /* YOUR CODE HERE */
+        return new CompareSlopes();
+    }
+
+    private class CompareSlopes implements Comparator<Point> {
+
+        public int compare(Point p1, Point p2) {
+
+            double p1_slope = Point.this.slopeTo(p1);
+            double p2_slope = Point.this.slopeTo(p2);
+
+            if (p1_slope > p2_slope) return 1;
+            else if (p1_slope == p2_slope) return 0;
+            else return -1;
+        }
+    }
+
+
+    /**
+     * Returns a string representation of this point.
+     * This method is provide for debugging;
+     * your program should not rely on the format of the string representation.
+     *
+     * @return a string representation of this point
+     */
+    public String toString() {
+        /* DO NOT MODIFY */
+        return "(" + x + ", " + y + ")";
+    }
+
+    /**
+     * Unit tests the Point data type.
+     */
+    public static void main(String[] args) {
+        /* YOUR CODE HERE */
+
+        // test point creation
+        Point p1 = new Point(2, 2);
+        Point p2 = new Point(3, 3);
+        StdOut.println("point created: " + p1.toString());
+        StdOut.println("point created: " + p2.toString());
+
+        // test slope function
+        StdOut.println("slope is: " + Double.toString(p1.slopeTo(p2)));
+
+        // compare two points
+        StdOut.println(p1.compareTo(p2));
+        Point p3 = new Point(3, 2);
+        StdOut.println(p1.compareTo(p3));
+
+        // create thrid point and create comperator to compare slopes.
+        Comparator<Point> comparePoints = p1.slopeOrder();
+        StdOut.println(comparePoints.compare(p2, p3));
+
+    }
+}
+
+
+// longer (but perhaps safer implementation of comperator with embeded slope
+
+/*
+            double slope_p1;
+            double slope_p2;
+
+            int dy1 = p1.y - y;
+            int dy2 = p2.y - y;
+
+            int dx1 = p1.x - x;
+            int dx2 = p2.x - x;
+
+            // SLOPE
+            // vertical slope
+            if (dx1 == 0) {
+                if (dy1 == 0) slope_p1 = Double.NEGATIVE_INFINITY;
+                else slope_p1 = Double.POSITIVE_INFINITY;
+            }
+            if (dx2 == 0) {
+                if (dy2 == 0) slope_p2 = Double.NEGATIVE_INFINITY;
+                else slope_p2 = Double.POSITIVE_INFINITY;
+            }
+
+            // horizontal slope
+            if (dy1 == 0) slope_p1 = 0.0;
+            if (dy2 == 0) slope_p2 = 0.0;
+
+            // normal case
+            slope (double) (dy1) / (double) (dx1);
+ */
